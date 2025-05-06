@@ -2,7 +2,7 @@
 
 This project provides a robust solution for detecting tables and extracting their titles from PDF documents, supporting both scanned (image-based) and digital (text-based) PDFs.
 
-## High-Level Design
+## Design
 
 ```mermaid
 graph TD
