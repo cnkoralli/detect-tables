@@ -1,74 +1,26 @@
-# Table Detection and Title Extraction from PDFs
+# 🧾 Financial Table Title Extractor from PDF Documents
 
-This project provides a robust solution for detecting tables and extracting their titles from PDF documents, supporting both scanned (image-based) and digital (text-based) PDFs.
+A Python-based solution to process **digital** and **scanned financial statement PDFs**, detect **table regions**, extract their **titles** using OCR and layout analysis, and export the result as a structured CSV file.
 
-## Features
+---
 
-- Process both digital and scanned PDF files
-- Detect tables using layout analysis
-- Extract table titles based on proximity and header patterns
-- Generate structured output (CSV/JSON) with table titles and page numbers
-- Handle multi-page tables and missing titles
-- Support for OCR on scanned documents
+## 🚀 Features
 
-## Installation
+- ✅ Supports **both scanned and digital** PDFs
+- ✅ Detects **table locations** using layout analysis
+- ✅ Extracts **titles** using OCR with pattern matching and positional proximity
+- ✅ Works across multiple pages
+- ✅ Outputs: `Table Title`, `Page Number` as CSV
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/cnkoralli/detect-tables.git
-   cd detect-tables
-   ```
+---
 
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+## 📌  Design
 
-4. Install Tesseract OCR:
-- Windows: Download and install from https://github.com/UB-Mannheim/tesseract/wiki
-- Linux: `sudo apt-get install tesseract-ocr`
-- macOS: `brew install tesseract`
-
-## Usage
-
-1. Place your PDF files in the `input` directory
-2. Run the script:
-```bash
-python table_detector.py --input input/ --output output/
-```
-
-3. The script will generate:
-- A CSV file with table titles and page numbers
-- A JSON file with detailed table information
-
-## Configuration
-
-Create a `.env` file in the project root with the following variables:
-```
-TESSERACT_PATH=/path/to/tesseract
-PADDLEOCR_LANG=en
-```
-
-## Output Format
-
-### CSV Output
-```csv
-Table Title,Page Number
-"Balance Sheet",1
-"Income Statement",2
-```
-
-### JSON Output
-```json
-[
-    {
-        "title": "Balance Sheet",
-        "page_number": 1,
-        "confidence": 0.95
-    }
-]
-```
-
-## License
-
-MIT License 
+```mermaid
+flowchart TD
+    A[PDF File (Scanned or Digital)] --> B[Convert Pages to Images (pdf2image)]
+    B --> C[Run OCR on Each Page (PaddleOCR)]
+    A --> D[Run Table Detection (pdfplumber)]
+    C & D --> E[For Each Table: Find Text Inside or Around It]
+    E --> F[Match Texts Against Title Patterns using Regex]
+    F --> G[Export CSV with Table Titles and Page Numbers]
