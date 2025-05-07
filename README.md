@@ -1,137 +1,118 @@
-### **Title: Table Title Detection from Scanned and Digital Financial PDFs**
+# Table Detection and Title Extraction from PDFs
 
----
+This project provides a robust solution for detecting tables and extracting their titles from PDF documents, supporting both scanned (image-based) and digital (text-based) PDFs.
 
-### **1. High-Level Design**
+## Design
 
-This project automatically detects **tables** and extracts their **titles** from financial PDF documents (both scanned and digital). It uses layout analysis, OCR, and text pattern recognition to identify key financial statements.
-
-#### **Processing Flow:**
-
-```
-            +-------------------+
-            |    Input PDF      |
-            +--------+----------+
-                     |
-                     v
-        +------------+------------+
-        | Determine if PDF is     |
-        | scanned or text-based   |
-        +------------+------------+
-                     |
-          +----------+----------+
-          |                     |
-          v                     v
-  [Scanned PDF]          [Digital PDF]
-  Image conversion       Text extraction (PyMuPDF, pdfplumber)
-  + table detection      + regex pattern search
-  + OCR on titles        + title matching
-                     \         /
-                      \       /
-                     +---------+
-                     | Filtered |
-                     |  Titles  |
-                     +----+----+
-                          |
-                          v
-                 Output CSV/JSON File
+```mermaid
+graph TD
+    A[Input PDF] --> B{PDF Type Detection}
+    B -->|Scanned PDF| C[Image Processing]
+    B -->|Digital PDF| D[Text Processing]
+    
+    C --> C1[Convert to Images]
+    C1 --> C2[Table Detection]
+    C2 --> C3[OCR Title Extraction]
+    
+    D --> D1[PyMuPDF Processing]
+    D --> D2[PDFPlumber Processing]
+    D1 --> D3[Title Pattern Matching]
+    D2 --> D3
+    
+    C3 --> E[Title Validation]
+    D3 --> E
+    E --> F[Output CSV]
 ```
 
----
+### Processing Flow
+1. **PDF Type Detection**
+   - Analyzes PDF to determine if it's scanned or digital
+   - Uses text content and image presence for classification
 
-### **2. Implementation Details**
+2. **Table Detection**
+   - For scanned PDFs: Uses OpenCV for image processing and table structure detection
+   - For digital PDFs: Uses PyMuPDF and PDFPlumber for structural analysis
 
-#### **Technologies Used:**
+3. **Title Extraction**
+   - Scanned PDFs: OCR-based extraction with pattern matching
+   - Digital PDFs: Direct text extraction with pattern matching
+   - Validates titles against known financial statement patterns
 
-| Tool/Library     | Purpose                                                            |
-| ---------------- | ------------------------------------------------------------------ |
-| `pdf2image`      | Converts scanned PDFs to high-resolution images                    |
-| `pytesseract`    | OCR engine for extracting text from images                         |
-| `opencv-python`  | Detects table regions using morphological operations               |
-| `PyMuPDF (fitz)` | Parses and extracts text from digital PDFs                         |
-| `pdfplumber`     | Alternative method to extract structured tables from digital PDFs  |
-| `re` (regex)     | Matches known table title patterns like “Balance Sheet”, “Profit…” |
-| `pandas`         | Organizes final output and writes to CSV                           |
-| `argparse`       | CLI interface to pass input/output file paths                      |
-| `logging`        | Provides structured feedback and debugging info                    |
+## Implementation Details
 
-#### **Why These Tools?**
+### Tools and Libraries
 
-* Tesseract + OpenCV are powerful for image-based OCR + layout detection.
-* PyMuPDF and pdfplumber offer fast, accurate text-level access for digital PDFs.
-* Regex rules allow for flexible and customizable title recognition.
+1. **Core Libraries**
+   - `pdf2image`: Converts PDFs to images for scanned document processing
+   - `PyMuPDF (fitz)`: Primary PDF processing for digital documents
+   - `PDFPlumber`: Secondary PDF processing for structural analysis
+   - `OpenCV`: Image processing and table detection
+   - `pytesseract`: OCR for text extraction from images
+   - `pandas`: Data handling and CSV output
 
----
+2. **Rationale for Tool Choices**
+   - **PDF Processing**: PyMuPDF and PDFPlumber provide complementary capabilities
+     - PyMuPDF: Fast text extraction and basic structure analysis
+     - PDFPlumber: Better table structure detection
+   - **Image Processing**: OpenCV for robust table detection
+     - Efficient image processing
+     - Advanced contour detection for table boundaries
+   - **OCR**: Tesseract (via pytesseract)
+     - Industry standard OCR engine
+     - Good accuracy for financial documents
+     - Configurable for different text types
 
-### **3. How to Build and Run the Project**
+3. **Pattern Matching**
+   - Regular expressions for title detection
+   - Predefined patterns for common financial statements
+   - Flexible matching for variations in title formats
 
-#### ✅ **Step 1: Install Required Packages**
+## Steps to Build and Test
 
-Use the terminal inside Replit or your local environment:
+### Prerequisites
+1. Python 3.7 or higher
+2. Tesseract OCR installed on your system
+3. Required Python packages (install via pip):
+   ```bash
+   pip install pdf2image PyMuPDF pdfplumber opencv-python pytesseract pandas numpy Pillow
+   ```
 
-```bash
-pip install pdf2image pytesseract opencv-python pillow fitz pdfplumber pandas
-```
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/cnkoralli/detect-tables.git
+   cd detect-tables
+   ```
 
-Also install Tesseract OCR on your system:
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-* Windows: [https://github.com/tesseract-ocr/tesseract](https://github.com/tesseract-ocr/tesseract)
-* macOS: `brew install tesseract`
-* Linux: `sudo apt install tesseract-ocr`
+### Usage
+1. Basic usage:
+   ```bash
+   python main.py input.pdf --output results.csv
+   ```
 
-Install **poppler** (for `pdf2image`):
+2. The script will:
+   - Detect PDF type (scanned/digital)
+   - Process tables and extract titles
+   - Save results to CSV file
 
-* Windows: [https://github.com/oschwartz10612/poppler-windows/releases](https://github.com/oschwartz10612/poppler-windows/releases)
-* macOS: `brew install poppler`
-* Linux: `sudo apt install poppler-utils`
+### Testing
+1. Test with sample PDFs:
+   - Digital PDF: `python main.py sample_digital.pdf --output digital_results.csv`
+   - Scanned PDF: `python main.py sample_scanned.pdf --output scanned_results.csv`
 
----
+2. Verify output:
+   - Check generated CSV file for extracted titles
+   - Review log messages for processing details
 
-#### ✅ **Step 2: Prepare Your Project Folder**
+### Output Format
+The CSV file contains:
+- Table Title: Extracted title of the table
+- Page Number: Page where the table was found
 
-Structure:
-
-```
-project/
-├── main.py
-├── sample.pdf
-├── output.csv
-└── README.md
-```
-
----
-
-#### ✅ **Step 3: Run the Script**
-
-```bash
-python main.py sample.pdf --output output.csv
-```
-
-This will:
-
-* Detect if the PDF is scanned or digital.
-* Apply appropriate extraction logic.
-* Save the output titles with page numbers in a clean CSV.
-
----
-
-### **4. Sample Output**
-
-```csv
-Table Title,Page Number
-Balance Sheet as at 31st March 2023,2
-Statement of Profit and Loss for the year ended 31st March 2023,4
-Notes to Financial Statements,6
-```
-
----
-
-### **5. Customization & Extensions**
-
-* Add support for more title patterns in `TABLE_PATTERNS`.
-* Export results to JSON by modifying `extract_table_titles`.
-* Add image export of cropped table areas.
-* Wrap into a web UI using Streamlit.
-
----
-
+## Contributing
+Feel free to submit issues and enhancement requests!
