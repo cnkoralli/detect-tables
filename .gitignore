@@ -1,6 +1,6 @@
 # Environment variables
 .env
-.env.local
+.env.*
 
 # Python
 __pycache__/
@@ -8,7 +8,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -20,12 +19,14 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 
 # Virtual Environment
 venv/
+.venv/
 ENV/
 
 # IDE
@@ -34,14 +35,18 @@ ENV/
 *.swp
 *.swo
 
+# Logs
+*.log
+
+# Local configuration
+config.ini
+credentials.json
+*_key.txt
+
 # Output files
 output/
 *.csv
 *.json
 *.pdf
 
-# Logs
-*.log 
-venv/
-.env/
-.venv/
+
